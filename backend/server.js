@@ -23,8 +23,8 @@ const countrySchema = new mongoose.Schema({
   bebekOlumOrani: Number,
   saglikHarcamalari: Number,
   yasamSuresi: Number,
-  ilkOkulKayitOrani: Number,
-  isizlikOrani: Number,
+  ilkokulKayitOrani: Number,
+  issizlikOrani: Number,
   kisiBasiGsyih: Number,
   coordinates: Array
 }, { collection: 'Ulkeler' });  // Koleksiyon adı 'Ulkeler' olarak ayarlandı
