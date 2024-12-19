@@ -144,7 +144,7 @@ app.get('/countries/income', async (req, res) => {
 
 
 
-// Ülke adına göre verileri getiren API
+// Ülke adına göre verileri getiren API (Büyük/Küçük Harf Duyarsız)
 app.get('/countries/find-by-name', async (req, res) => {
   const { name } = req.query;
 
@@ -153,8 +153,10 @@ app.get('/countries/find-by-name', async (req, res) => {
   }
 
   try {
-    // Ülke adına göre MongoDB'den veri çekme
-    const country = await Country.findOne({ country: name });
+    // Büyük/küçük harf duyarsız sorgu (regex ve 'i' bayrağı ile)
+    const country = await Country.findOne({
+      country: { $regex: new RegExp(`^${name}$`, 'i') }
+    });
 
     if (country) {
       res.json(country);
@@ -166,6 +168,7 @@ app.get('/countries/find-by-name', async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 // Sunucuyu başlatmak için port belirleme
 const PORT = process.env.PORT || 5000;

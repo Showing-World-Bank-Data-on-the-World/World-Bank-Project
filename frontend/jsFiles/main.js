@@ -511,7 +511,7 @@ const countryISOMap = {
 
 function askForDetails(countryName) {
     console.log(`askForDetails fonksiyonu ${countryName} için çağrıldı.`);
-    
+
     // Modal başlığını ve bayrağı ayarla
     const mappedName = country_translation_map[countryName] || countryName;
     const countryCode = countryISOMap[countryName];
@@ -522,6 +522,7 @@ function askForDetails(countryName) {
 
     modalTitle.innerHTML = `${mappedName} <img src="${flagUrl}" alt="${countryName} Bayrağı" style="width:30px; height:20px; margin-left:10px;" />`;
 
+    // Vikipedi API'den bilgi çekme
     fetch(`https://tr.wikipedia.org/api/rest_v1/page/summary/${mappedName}`)
         .then(response => response.json())
         .then(data => {
@@ -536,21 +537,97 @@ function askForDetails(countryName) {
             modalBody.textContent = "Ülke bilgisi alınırken bir hata oluştu.";
         });
 
+    // "Tamam" butonuna olay dinleyicisi ekle
+    const tamamButton = document.querySelector('.modal-footer .tamam-button');
+    tamamButton.onclick = function () {
+        fetchDataFromDatabase(countryName);
+        closeModal();  // Modalı kapat
+    };
+
     // Bootstrap modal'ı aç
-    const modal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+    const modal = new bootstrap.Modal(document.getElementById('staticBackdrop'), {
+        backdrop: 'static',
+        keyboard: false
+    });
     modal.show();
 }
 
-// Modal kapanınca arkada kalan sınıfları kaldır
-const modalElement = document.getElementById('staticBackdrop');
-modalElement.addEventListener('hidden.bs.modal', function () {
-    // Modal kapandığında 'modal-backdrop' sınıfını kaldır
-    document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+// Modal kapanma fonksiyonu
+function closeModal() {
+    const modal = bootstrap.Modal.getInstance(document.getElementById('staticBackdrop'));
+    modal.hide();
+}
 
-    // Ek olarak, soluklaşma etkisini düzeltmek için gerekli stil veya sınıfları temizleyebilirsin
-    document.body.classList.remove('modal-open');
-    document.body.style = ""; // Varsa, body'ye eklenmiş stilleri temizler
-});
+// API'den veriyi çek ve tabloyu güncelle
+function fetchDataFromDatabase(countryName) {
+    const url = `http://localhost:5000/countries/find-by-name?name=${countryName}`;
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Veri bulunamadı (HTTP ${response.status})`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data) {
+                console.log("Veri başarıyla çekildi:", data);
+                updateTableWithDatabaseData(data);
+            } else {
+                console.error("Veri bulunamadı.");
+            }
+        })
+        .catch(error => {
+            console.error("Veri tabanından veri alınırken hata:", error);
+        });
+}
+
+// Tabloyu güncelleme fonksiyonu
+function updateTableWithDatabaseData(countryData) {
+    const metricTableContainer = document.getElementById('metricTableContainer');
+    const metricTableBody = document.getElementById('metricTableBody');
+    metricTableBody.innerHTML = "";  // Önceki verileri temizle
+
+    console.log("Gelen Veri:", countryData); // Tam veri çıktısı
+
+    // Doğru etiket karşılıkları
+    const correctMapping = {
+        "Enflasyon Oranı (%)": "Enflasyon Oranı (%)",
+        "intiharOrani": "İntihar Oranı (%)",
+        "Doğum Oranı (1000 Kişi Başına)": "Doğum Oranı (1000 Kişi Başına)",
+        "Bebek Ölüm Oranı (1000 Canlı Doğum Başına)": "Bebek Ölüm Oranı (1000 Canlı Doğum Başına)",
+        "Sağlık Harcamaları (% GSYİH)": "Sağlık Harcamaları (% GSYİH)",
+        "Doğumda Beklenen Yaşam Süresi (yıl)": "Doğumda Beklenen Yaşam Süresi (yıl)",
+        "İlkokul Kaydı Oranı (%)": "İlkokul Kaydı Oranı (%)",
+        "Kişi Başına GSYİH (ABD Doları)": "Kişi Başına GSYİH (ABD Doları)",
+        "İşsizlik Oranı (%)": "İşsizlik Oranı (%)"
+    };
+
+    // Her bir metrik için tabloyu güncelle
+    for (const [key, value] of Object.entries(countryData)) {
+        const label = correctMapping[key] || key; // Eğer karşılık yoksa doğrudan key kullan
+        console.log(`Anahtar: ${key}, Etiket: ${label}, Değer: ${value}`);
+
+        if (correctMapping[key] && value !== undefined && value !== null) {
+            const row = `
+                <tr>
+                    <td>${label}</td>
+                    <td>${value}</td>
+                </tr>
+            `;
+            metricTableBody.innerHTML += row;
+        } else {
+            console.error(`Eksik veya tanımsız veri: ${key}`);
+        }
+    }
+
+    // Tabloyu göster
+    metricTableContainer.style.display = "block";
+}
+
+
+    
+
 
 
 
