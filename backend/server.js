@@ -23,7 +23,7 @@ const countrySchema = new mongoose.Schema({
   bebekOlumOrani: Number,
   saglikHarcamalari: Number,
   yasamSuresi: Number,
-  ilkokulKayitOrani: Number,
+  ilkokulKaydiOrani: Number,
   issizlikOrani: Number,
   kisiBasiGsyih: Number,
   coordinates: Array
