@@ -66,26 +66,26 @@ function updateMetricTable(selectedMetrics, year, countryName) {
     // Veritabanındaki alan adlarını basitleştirilmiş metrik adlarıyla eşleme
 const metricMapping = {
     enflasyonOrani: "Enflasyon Oranı (%)",
-    intiharOrani: "intiharOrani",
     dogumOrani: "Doğum Oranı (1000 Kişi Başına)",
     bebekOlumOrani: "Bebek Ölüm Oranı (1000 Canlı Doğum Başına)",
     saglikHarcamalari: "Sağlık Harcamaları (% GSYİH)",
     yasamSuresi: "Doğumda Beklenen Yaşam Süresi (yıl)",
     ilkokulKayitOrani: "İlkokul Kaydı Oranı (%)",
     isizlikOrani: "İşsizlik Oranı (%)",
-    kisiBasiGsyih: "Kişi Başına GSYİH (ABD Doları)"
+    kisiBasiGsyih: "Kişi Başına GSYİH (ABD Doları)",
+    İntiharOrani: "İntiharOrani"
 };
     // Metriklerin tam adları (checkbox'lara göre)
     const metrics = [
-        { key: 'enflasyonOrani', short: 'Enf', full: 'Enflasyon Oranı' },
-        { key: 'intiharOrani', short: 'İnt', full: 'İntihar Oranı' },
-        { key: 'dogumOrani', short: 'Doğ', full: 'Doğum Oranı' },
-        { key: 'bebekOlumOrani', short: 'Beb', full: 'Bebek Ölüm Oranı' },
-        { key: 'saglikHarcamalari', short: 'Sağ', full: 'Sağlık Harcamaları' },
-        { key: 'yasamSuresi', short: 'Yaş', full: 'Yaşam Süresi' },
-        { key: 'ilkokulKayitOrani', short: 'İlk', full: 'İlkokul Kayıt Oranı' },
-        { key: 'kisiBasiGsyih', short: 'GSYİH', full: 'Kişi Başına Gelir' },
-        { key: 'isizlikOrani', short: 'İşs', full: 'İşsizlik Oranı' }
+        { key: 'enflasyonOrani', short: 'Enf(%)', full: 'Enflasyon Oranı' },
+        { key: 'dogumOrani', short: 'Doğ(‰)', full: 'Doğum Oranı' },
+        { key: 'bebekOlumOrani', short: 'Beb(‰)', full: 'Bebek Ölüm Oranı' },
+        { key: 'saglikHarcamalari', short: 'Sağ(% GSYİH)' , full: 'Sağlık Harcamaları' },
+        { key: 'yasamSuresi', short: 'Yaş(yıl)', full: 'Yaşam Süresi' },
+        { key: 'ilkokulKayitOrani', short: 'İlk(%)', full: 'İlkokul Kayıt Oranı' },
+        { key: 'isizlikOrani', short: 'İşs(%)', full: 'İşsizlik Oranı' },
+        { key: 'kisiBasiGsyih', short: 'GSYİH(ABD Doları)', full: 'Kişi Başına Gelir' },
+        { key: 'İntiharOrani', short: 'İnt(%)', full: 'İntihar oranı' }
     ];
 
     // Başlıkları ekle

@@ -1,5 +1,20 @@
-// Erişim tokeninizi buraya ekleyin
-Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwN2VhNzQyNy00ZDQ3LTQxMGYtYmMyMi03NjkyMGViZTI0OTkiLCJpZCI6MjQ2Mjc3LCJpYXQiOjE3MjgyNDM2MjF9.VGB3PP47uc9MLLHpDdtxO50yHd6terivkjblSFLMk6c';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000'; // Geliştirme için localhost
+
+fetch(`${API_URL}/api/token`) // Backend URL'si
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`Token alınırken hata oluştu: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        Cesium.Ion.defaultAccessToken = data.token; // Tokeni Cesium'a ayarla
+        console.log('Token başarıyla alındı:', data.token);
+    })
+    .catch(error => {
+        console.error('Token alınırken hata oluştu:', error);
+    });
+
 // CesiumJS Viewer Başlat
 const viewer = new Cesium.Viewer('cesiumContainer', {
     terrainProvider: Cesium.createWorldTerrain(),
@@ -625,15 +640,15 @@ function updateTableWithSelectedMetrics(countryData, selectedMetrics) {
     metricTableHead.innerHTML = "<th>ÜLKE</th><th>TARİH</th>"; // Başlıkları temizle ve ÜLKE ile TARİH ekle
 
     const metricMapping = {
-        1: { key: "Enflasyon Oranı (%)", label: "ENF" },
-        2: { key: "intiharOrani", label: "İNT" },
-        3: { key: "Doğum Oranı (1000 Kişi Başına)", label: "DOĞ" },
-        4: { key: "Bebek Ölüm Oranı (1000 Canlı Doğum Başına)", label: "BEB" },
-        5: { key: "Sağlık Harcamaları (% GSYİH)", label: "SAĞ" },
-        6: { key: "Doğumda Beklenen Yaşam Süresi (yıl)", label: "YAŞ" },
-        7: { key: "İlkokul Kaydı Oranı (%)", label: "İLK" },
-        8: { key: "Kişi Başına GSYİH (ABD Doları)", label: "KBDG" },
-        9: { key: "İşsizlik Oranı (%)", label: "İŞS" }
+        1: { key: "Enflasyon Oranı (%)", label: "Enf(%)" },
+        2: { key: "Doğum Oranı (1000 Kişi Başına)", label: "Doğ(‰)" },
+        3: { key: "Bebek Ölüm Oranı (1000 Canlı Doğum Başına)", label: "Beb(‰)" },
+        4: { key: "Sağlık Harcamaları (% GSYİH)", label: "Sağ(% GSYİH)" },
+        5: { key: "Doğumda Beklenen Yaşam Süresi (yıl)", label: "Yaş(yıl)" },
+        6: { key: "İlkokul Kaydı Oranı (%)", label: "İlk(%)" },
+        7: { key: "İşsizlik Oranı (%)", label: "İşs(%)" },
+        8: { key: "Kişi Başına GSYİH (ABD Doları)", label: "GSYİH(ABD Doları)" },
+        9: { key: "İntiharOrani", label: "İnt(%)" }
     };
 
     // Tablo başlıklarını güncelle

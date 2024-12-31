@@ -1,5 +1,5 @@
 // Gerekli paketleri yükleme
-require('dotenv').config();
+require('dotenv').config({ path: '../.env' });
 const express = require('express');
 const app = express();
 const mongoose = require('mongoose');
@@ -8,8 +8,25 @@ const cors = require('cors');
 app.use(cors());
 app.use(express.json());
 
-// MongoDB bağlantısını yapma
-mongoose.connect('mongodb+srv://emre23askin:753159@cluster0.qflx0.mongodb.net/Vtys?retryWrites=true&w=majority&appName=Cluster0')
+// Tokeni frontend'e gönderme
+app.get('/api/token', (req, res) => {
+  const token = process.env.CESIUM_ACCESS_TOKEN;
+  if (!token) {
+    return res.status(500).json({ message: 'Token bulunamadı.' });
+  }
+  res.json({ token });
+});
+
+// .env dosyasından bağlantı URL'sini al
+const mongoUri = process.env.MONGO_URI;
+
+
+if (!mongoUri) {
+  console.error('MONGO_URI tanımlanmamış! Lütfen .env dosyanızı kontrol edin.');
+  process.exit(1);
+}
+
+mongoose.connect(mongoUri) // Artık seçeneklere gerek yok
   .then(() => console.log('MongoDB bağlantısı başarılı'))
   .catch(error => console.error('MongoDB bağlantı hatası:', error));
 
@@ -18,15 +35,14 @@ const countrySchema = new mongoose.Schema({
   country: String,
   date: Date,
   enflasyonOrani: Number,
-  intiharOrani: Number,
+  İntiharOrani: Number,
   dogumOrani: Number,
   bebekOlumOrani: Number,
   saglikHarcamalari: Number,
   yasamSuresi: Number,
   ilkokulKaydiOrani: Number,
   issizlikOrani: Number,
-  kisiBasiGsyih: Number,
-  coordinates: Array
+  kisiBasiGsyih: Number
 }, { collection: 'Ulkeler' });  // Koleksiyon adı 'Ulkeler' olarak ayarlandı
 
 const Country = mongoose.model('Country', countrySchema);
@@ -38,7 +54,7 @@ app.get('/countries', async (req, res) => {
   // Veritabanındaki alan adlarını basitleştirilmiş metrik adlarıyla eşleme
   const metricMapping = {
     enflasyonOrani: "Enflasyon Oranı (%)",
-    intiharOrani: "intiharOrani",
+    İntiharOrani: "İntiharOrani",
     dogumOrani: "Doğum Oranı (1000 Kişi Başına)",
     bebekOlumOrani: "Bebek Ölüm Oranı (1000 Canlı Doğum Başına)",
     saglikHarcamalari: "Sağlık Harcamaları (% GSYİH)",
