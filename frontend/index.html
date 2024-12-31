@@ -8,22 +8,37 @@
     <script src="https://cesium.com/downloads/cesiumjs/releases/1.106/Build/Cesium/Cesium.js"></script>
     <link href="https://cesium.com/downloads/cesiumjs/releases/1.106/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-m1YVB5UlHDNl1I4/7DP95xiAW2VohTCsmpp6mmdyTNFx4BJ9UgKZ76QUwBpsZJBm" crossorigin="anonymous">
+    <link rel="stylesheet"   href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <!-- Home (Navigation) Çubuğu -->
-    <nav class="navbar">
-        <div class="navbar-logo">Logo</div>
-        <ul class="navbar-menu">
-            <li><a href="#home">Anasayfa</a></li>
-            <li><a href="#cesiumContainer">Harita</a></li>
-            <li><a href="#contact">İletişim</a></li>
-        </ul>
-    </nav>
+<!-- Home (Navigation) Çubuğu -->
+<nav class="navbar">
+    <div class="navbar-logo">
+        <img src="./WhatsApp Image 2024-12-30 at 22.58.41.jpeg" alt="Proje Logosu" class="project-logo">
+    </div>
+    <ul class="navbar-menu">
+        <li><a href="#cesiumContainer">Harita</a></li>
+    </ul>
+    <div class="navbar-search">
+        <input
+            type="text"
+            id="search-input"
+            placeholder="Ülke ara..."
+            oninput="filterCountries(this.value)"
+        />
+        <button class="search-icon" onclick="searchCountry()">
+            <i class="fas fa-search"></i>
+        </button>
+        <ul id="search-results" class="search-results"></ul>
+    </div>
+</nav>
 
-    <!-- Checkbox Listesi (3x3 düzen) -->
-    <div class="checkbox-container">
-        <!-- İlk Sıra -->
-        <div class="checkbox-row">
+
+<div class="metric-menu-container">
+    <button class="metric-menu-button" onclick="toggleMetricMenu()">Metrik Seç</button>
+    <div class="metric-menu-content">
+        <div class="checkbox-container">
             <div class="list-group-item">
                 <input class="form-check-input" type="checkbox" value="" id="checkbox1">
                 <label class="form-check-label" for="checkbox1">Enflasyon oranı</label>
@@ -36,10 +51,6 @@
                 <input class="form-check-input" type="checkbox" value="" id="checkbox3">
                 <label class="form-check-label" for="checkbox3">Doğum oranı</label>
             </div>
-        </div>
-
-        <!-- İkinci Sıra -->
-        <div class="checkbox-row">
             <div class="list-group-item">
                 <input class="form-check-input" type="checkbox" value="" id="checkbox4">
                 <label class="form-check-label" for="checkbox4">Bebek ölüm oranı</label>
@@ -52,10 +63,6 @@
                 <input class="form-check-input" type="checkbox" value="" id="checkbox6">
                 <label class="form-check-label" for="checkbox6">Yaşam süresi</label>
             </div>
-        </div>
-
-        <!-- Üçüncü Sıra -->
-        <div class="checkbox-row">
             <div class="list-group-item">
                 <input class="form-check-input" type="checkbox" value="" id="checkbox7">
                 <label class="form-check-label" for="checkbox7">İlkokul kayıt oranı</label>
@@ -66,10 +73,12 @@
             </div>
             <div class="list-group-item">
                 <input class="form-check-input" type="checkbox" value="" id="checkbox9">
-                <label class="form-check-label" for="checkbox9">Nüfus artış hızı</label>
+                <label class="form-check-label" for="checkbox9">İşsizlik Oranı</label>
             </div>
         </div>
     </div>
+</div>
+
 
     <!-- Cesium Haritası -->
     <div class="container">
@@ -83,7 +92,7 @@
                 <tr>
                     <th>Sıra</th>
                     <th>Ülke</th>
-                    <th>Kişi Başına Gelir</th>
+                    <th>KB.Gelir</th>
                 </tr>
             </thead>
             <tbody id="incomeTableBody">
@@ -135,7 +144,6 @@
       Yılları Seç
     </button>
     <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-        <li><input type="checkbox" class="year-checkbox" value="2024"> 2024</li>
         <li><input type="checkbox" class="year-checkbox" value="2023"> 2023</li>
         <li><input type="checkbox" class="year-checkbox" value="2022"> 2022</li>
         <li><input type="checkbox" class="year-checkbox" value="2021"> 2021</li>

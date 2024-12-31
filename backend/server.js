@@ -143,31 +143,52 @@ app.get('/countries/income', async (req, res) => {
 
 
 
-
-// Ülke adına göre verileri getiren API (Büyük/Küçük Harf Duyarsız)
 app.get('/countries/find-by-name', async (req, res) => {
-  const { name } = req.query;
+  const { name, years } = req.query;
 
   if (!name) {
-    return res.status(400).json({ message: "Ülke adı gereklidir." });
+      return res.status(400).json({ message: "Ülke adı gereklidir." });
   }
 
   try {
-    // Büyük/küçük harf duyarsız sorgu (regex ve 'i' bayrağı ile)
-    const country = await Country.findOne({
-      country: { $regex: new RegExp(`^${name}$`, 'i') }
-    });
+      console.log("Gelen Yıllar:", years);
 
-    if (country) {
-      res.json(country);
-    } else {
-      res.status(404).json({ message: "Ülke bulunamadı." });
-    }
+      // Gelen yılları işle
+      let yearArray = [];
+      if (years) {
+          yearArray = years.split(',').map(year => {
+              const date = new Date(year); // Tarihi `Date` formatına çevir
+              if (isNaN(date.getTime())) {
+                  throw new Error(`Geçersiz tarih formatı: ${year}`);
+              }
+              return date; // Doğru şekilde tarih arrayine ekle
+          });
+      }
+
+      // Sorguyu oluştur
+      const query = {
+          country: { $regex: new RegExp(`^${name}$`, 'i') } // Büyük/küçük harf duyarsız
+      };
+
+      if (yearArray.length > 0) {
+          query.date = { $in: yearArray }; // Tarih sorgusunu ekle
+      }
+
+      console.log("Oluşturulan Sorgu:", query);
+
+      const countries = await Country.find(query);
+
+      if (countries.length > 0) {
+          res.json(countries);
+      } else {
+          res.status(404).json({ message: "Veri bulunamadı." });
+      }
   } catch (error) {
-    console.error('Error fetching country by name:', error);
-    res.status(500).json({ message: error.message });
+      console.error('Error fetching data by name and years:', error);
+      res.status(500).json({ message: error.message });
   }
 });
+
 
 
 // Sunucuyu başlatmak için port belirleme

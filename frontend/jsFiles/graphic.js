@@ -1,15 +1,3 @@
-// Ülke verileri (Kişi başına gelir ve metrikler)
-const countries = [
-    { name: 'Türkiye', income: 45000, metrics: { enflasyon: 10, intihar: 5, dogum: 20, bebekOlum: 8, saglikHarcama: 15, yasamSuresi: 75, ilkOkulKayit: 90, kisiBasiGelir: 45000, nufusArtisi: 1.2 } },
-    { name: 'Almanya', income: 60000, metrics: { enflasyon: 2, intihar: 12, dogum: 8, bebekOlum: 5, saglikHarcama: 11, yasamSuresi: 81, ilkOkulKayit: 100, kisiBasiGelir: 60000, nufusArtisi: 0.5 } },
-    { name: 'Fransa', income: 48000, metrics: { enflasyon: 3, intihar: 10, dogum: 14, bebekOlum: 6, saglikHarcama: 13, yasamSuresi: 79, ilkOkulKayit: 95, kisiBasiGelir: 48000, nufusArtisi: 0.8 } },
-    { name: 'Türkiye', income: 45000, metrics: { enflasyon: 10, intihar: 5, dogum: 20, bebekOlum: 8, saglikHarcama: 15, yasamSuresi: 75, ilkOkulKayit: 90, kisiBasiGelir: 45000, nufusArtisi: 1.2 } },
-    { name: 'Almanya', income: 60000, metrics: { enflasyon: 2, intihar: 12, dogum: 8, bebekOlum: 5, saglikHarcama: 11, yasamSuresi: 81, ilkOkulKayit: 100, kisiBasiGelir: 60000, nufusArtisi: 0.5 } },
-    { name: 'Fransa', income: 48000, metrics: { enflasyon: 3, intihar: 10, dogum: 14, bebekOlum: 6, saglikHarcama: 13, yasamSuresi: 79, ilkOkulKayit: 95, kisiBasiGelir: 48000, nufusArtisi: 0.8 } },
-    { name: 'Türkiye', income: 45000, metrics: { enflasyon: 10, intihar: 5, dogum: 20, bebekOlum: 8, saglikHarcama: 15, yasamSuresi: 75, ilkOkulKayit: 90, kisiBasiGelir: 45000, nufusArtisi: 1.2 } },
-    { name: 'Almanya', income: 60000, metrics: { enflasyon: 2, intihar: 12, dogum: 8, bebekOlum: 5, saglikHarcama: 11, yasamSuresi: 81, ilkOkulKayit: 100, kisiBasiGelir: 60000, nufusArtisi: 0.5 } },
-    { name: 'Fransa', income: 48000, metrics: { enflasyon: 3, intihar: 10, dogum: 14, bebekOlum: 6, saglikHarcama: 13, yasamSuresi: 79, ilkOkulKayit: 95, kisiBasiGelir: 48000, nufusArtisi: 0.8 } }
-];
 
 // İlk tabloyu kişi başına gelire göre sıralayıp doldurma
 function loadIncomeTable() {
@@ -97,7 +85,7 @@ const metricMapping = {
         { key: 'yasamSuresi', short: 'Yaş', full: 'Yaşam Süresi' },
         { key: 'ilkokulKayitOrani', short: 'İlk', full: 'İlkokul Kayıt Oranı' },
         { key: 'kisiBasiGsyih', short: 'GSYİH', full: 'Kişi Başına Gelir' },
-        { key: 'nufusArtisHizi', short: 'Nüf', full: 'Nüfus Artış Hızı' }
+        { key: 'isizlikOrani', short: 'İşs', full: 'İşsizlik Oranı' }
     ];
 
     // Başlıkları ekle
@@ -132,7 +120,16 @@ const metricMapping = {
             console.error('API isteğinde hata:', error);
         });
 }
+let countries = []; // Ülke isimlerini saklamak için bir dizi
+
+
 
 
 // Sayfa yüklendiğinde ilk tabloyu göster
 loadIncomeTable();
+
+
+
+
+
+

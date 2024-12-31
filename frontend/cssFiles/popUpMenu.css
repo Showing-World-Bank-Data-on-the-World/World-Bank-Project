@@ -2,13 +2,13 @@
 #dropdownMenuButton {
     position: absolute;
     top: 80px;        /* Üstten boşluk */
-    right: 130px;     /* Sağdan boşluk */
-    width: 150px;     /* Buton genişliği */
-    height: 40px;     /* Buton yüksekliği */
-    background-color: #090808; /* Siyah temaya uygun koyu arka plan */
+    right: 30px;      /* Sağdan boşluk */
+    width: 130px;     /* Buton genişliği */
+    height: 35px;     /* Buton yüksekliği */
+    background-color: #333; /* Siyah temaya uygun koyu arka plan */
     color: white;
     border: none;
-    border-radius: 5px;  /* Butona yumuşak köşeler */
+    border-radius: 10px;  /* Butona yumuşak köşeler */
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Hafif gölge */
     font-size: 16px;
     cursor: pointer;
@@ -17,23 +17,25 @@
 
 /* Butonun üzerine gelince arka plan rengi ve gölgesini değiştir */
 #dropdownMenuButton:hover {
-    background-color: #555;
+    background-color: #444;
     box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* Dropdown menü stilini belirle */
 .dropdown-menu {
-    background-color: #040202; /* Daha koyu menü arka planı */
+    margin-top: 12px !important;
+    background-color: #222; /* Daha koyu menü arka planı */
     color: white;
     border: 1px solid #444;
-    border-radius: 5px;
-    width: 150px;   /* Menü genişliği */
+    border-radius: 8px;
+    width: 120px;   /* Menü genişliği */
+    
     padding: 10px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* Hafif gölge */
     list-style-type: none; /* List item noktalarını kaldır */
-    margin: 0; /* Dış boşlukları sıfırla */
+     /* Dış boşlukları sıfırla */
     padding-left: 0; /* İç boşlukları sıfırla */
-    max-height: 200px; /* Menünün maksimum yüksekliğini 50px ile sınırla */
+    max-height: 200px; /* Menünün maksimum yüksekliğini 200px ile sınırla */
     overflow-y: auto; /* İçerik sığmazsa dikey kaydırma çubuğu ekle */
 }
 
@@ -42,6 +44,7 @@
     padding: 8px 10px;
     margin-bottom: 5px;
     color: white;
+    top: 50px;
     background-color: transparent;
     border-radius: 3px;
     transition: background-color 0.3s ease;

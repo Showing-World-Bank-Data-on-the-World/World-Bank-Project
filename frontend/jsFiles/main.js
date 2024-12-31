@@ -315,7 +315,7 @@ country_translation_map = {
     'Portugal': 'Portekiz',
     'Paraguay': 'Paraguay',
     'Palestine': 'Filistin',
-    'Russia':'Rusya',
+    'Russian Federation':'Rusya',
     'Qatar': 'Katar',
     'Romania': 'Romanya',
     'Rwanda': 'Ruanda',
@@ -471,7 +471,7 @@ const countryISOMap = {
     "Portugal": "pt",
     "Qatar": "qa",
     "Romania": "ro",
-    "Russia": "ru",
+    "Russian Federation": "ru",
     "Rwanda": "rw",
     "Saudi Arabia": "sa",
     "Senegal": "sn",
@@ -489,10 +489,10 @@ const countryISOMap = {
     "Thailand": "th",
     "Togo": "tg",
     "Tunisia": "tn",
-    "Turkey": "tr",
+    "Turkiye": "tr",
     "Uganda": "ug",
     "Ukraine": "ua",
-    "United States of America": "us",
+    "United States": "us",
     "Uruguay": "uy",
     "Uzbekistan": "uz",
     "Venezuela": "ve",
@@ -540,9 +540,15 @@ function askForDetails(countryName) {
     // "Tamam" butonuna olay dinleyicisi ekle
     const tamamButton = document.querySelector('.modal-footer .tamam-button');
     tamamButton.onclick = function () {
-        fetchDataFromDatabase(countryName);
-        closeModal();  // Modalı kapat
+        const selectedMetrics = getSelectedMetrics(); // Seçilen metrikleri al
+        
+    
+        
+    
+        fetchDataFromDatabase(countryName, selectedMetrics); // Veriyi çek ve filtrele
+        closeModal(); // Modalı kapat
     };
+    
 
     // Bootstrap modal'ı aç
     const modal = new bootstrap.Modal(document.getElementById('staticBackdrop'), {
@@ -557,11 +563,38 @@ function closeModal() {
     const modal = bootstrap.Modal.getInstance(document.getElementById('staticBackdrop'));
     modal.hide();
 }
+function getSelectedMetrics() {
+    const checkboxes = document.querySelectorAll('.form-check-input'); // Tüm checkbox'ları seç
+    const selectedMetrics = [];
 
-// API'den veriyi çek ve tabloyu güncelle
-function fetchDataFromDatabase(countryName) {
-    const url = `http://localhost:5000/countries/find-by-name?name=${countryName}`;
+    checkboxes.forEach((checkbox, index) => {
+        if (checkbox.checked) {
+            selectedMetrics.push(index + 1); // Checkbox'ın index değerini ekle
+        }
+    });
 
+    return selectedMetrics;
+}
+
+function fetchDataFromDatabase(countryName, selectedMetrics) {
+    // İşaretlenen yılları al ve tam ISO formatına dönüştür
+    const yearCheckboxes = document.querySelectorAll('.year-checkbox:checked');
+    const selectedYears = Array.from(yearCheckboxes).map(checkbox => {
+        const year = checkbox.value;
+        return `${year}-01-01T00:00:00Z`; // ISO formatına dönüştür
+    });
+
+    console.log("Seçilen Yıllar (ISO Format):", selectedYears); // Konsolda kontrol
+
+    const url = new URL('http://localhost:5000/countries/find-by-name');
+    url.searchParams.append('name', countryName);
+
+    // Eğer yıllar seçildiyse sorguya ekle
+    if (selectedYears.length > 0) {
+        url.searchParams.append('years', selectedYears.join(',')); // Virgülle birleştir
+    }
+
+    // API isteği
     fetch(url)
         .then(response => {
             if (!response.ok) {
@@ -572,7 +605,7 @@ function fetchDataFromDatabase(countryName) {
         .then(data => {
             if (data) {
                 console.log("Veri başarıyla çekildi:", data);
-                updateTableWithDatabaseData(data);
+                updateTableWithSelectedMetrics(data, selectedMetrics); // Verileri tabloya ekle
             } else {
                 console.error("Veri bulunamadı.");
             }
@@ -582,51 +615,171 @@ function fetchDataFromDatabase(countryName) {
         });
 }
 
-// Tabloyu güncelleme fonksiyonu
-function updateTableWithDatabaseData(countryData) {
-    const metricTableContainer = document.getElementById('metricTableContainer');
+
+function updateTableWithSelectedMetrics(countryData, selectedMetrics) {
     const metricTableBody = document.getElementById('metricTableBody');
-    metricTableBody.innerHTML = "";  // Önceki verileri temizle
+    const metricTableHead = document.getElementById('metricTableHead');
 
-    console.log("Gelen Veri:", countryData); // Tam veri çıktısı
+    // Önceki tabloyu temizle
+    metricTableBody.innerHTML = "";
+    metricTableHead.innerHTML = "<th>ÜLKE</th><th>TARİH</th>"; // Başlıkları temizle ve ÜLKE ile TARİH ekle
 
-    // Doğru etiket karşılıkları
-    const correctMapping = {
-        "Enflasyon Oranı (%)": "Enflasyon Oranı (%)",
-        "intiharOrani": "İntihar Oranı (%)",
-        "Doğum Oranı (1000 Kişi Başına)": "Doğum Oranı (1000 Kişi Başına)",
-        "Bebek Ölüm Oranı (1000 Canlı Doğum Başına)": "Bebek Ölüm Oranı (1000 Canlı Doğum Başına)",
-        "Sağlık Harcamaları (% GSYİH)": "Sağlık Harcamaları (% GSYİH)",
-        "Doğumda Beklenen Yaşam Süresi (yıl)": "Doğumda Beklenen Yaşam Süresi (yıl)",
-        "İlkokul Kaydı Oranı (%)": "İlkokul Kaydı Oranı (%)",
-        "Kişi Başına GSYİH (ABD Doları)": "Kişi Başına GSYİH (ABD Doları)",
-        "İşsizlik Oranı (%)": "İşsizlik Oranı (%)"
+    const metricMapping = {
+        1: { key: "Enflasyon Oranı (%)", label: "ENF" },
+        2: { key: "intiharOrani", label: "İNT" },
+        3: { key: "Doğum Oranı (1000 Kişi Başına)", label: "DOĞ" },
+        4: { key: "Bebek Ölüm Oranı (1000 Canlı Doğum Başına)", label: "BEB" },
+        5: { key: "Sağlık Harcamaları (% GSYİH)", label: "SAĞ" },
+        6: { key: "Doğumda Beklenen Yaşam Süresi (yıl)", label: "YAŞ" },
+        7: { key: "İlkokul Kaydı Oranı (%)", label: "İLK" },
+        8: { key: "Kişi Başına GSYİH (ABD Doları)", label: "KBDG" },
+        9: { key: "İşsizlik Oranı (%)", label: "İŞS" }
     };
 
-    // Her bir metrik için tabloyu güncelle
-    for (const [key, value] of Object.entries(countryData)) {
-        const label = correctMapping[key] || key; // Eğer karşılık yoksa doğrudan key kullan
-        console.log(`Anahtar: ${key}, Etiket: ${label}, Değer: ${value}`);
-
-        if (correctMapping[key] && value !== undefined && value !== null) {
-            const row = `
-                <tr>
-                    <td>${label}</td>
-                    <td>${value}</td>
-                </tr>
-            `;
-            metricTableBody.innerHTML += row;
-        } else {
-            console.error(`Eksik veya tanımsız veri: ${key}`);
+    // Tablo başlıklarını güncelle
+    selectedMetrics.forEach(metricIndex => {
+        if (metricMapping[metricIndex]) {
+            metricTableHead.innerHTML += `<th>${metricMapping[metricIndex].label}</th>`;
         }
+    });
+
+    // Veriler birden fazla yıl için geldiyse
+    if (Array.isArray(countryData)) {
+        countryData.forEach(data => {
+            const row = [`<td>${data.country}</td>`, `<td>${data.date ? new Date(data.date).toLocaleDateString() : "Tarih yok"}</td>`]; // Ülke ve Tarih sütunları
+
+            selectedMetrics.forEach(metricIndex => {
+                const metric = metricMapping[metricIndex];
+                if (metric) {
+                    const value = data[metric.key] !== undefined ? data[metric.key] : "Veri yok";
+                    row.push(`<td>${value}</td>`);
+                }
+            });
+
+            metricTableBody.innerHTML += `<tr>${row.join('')}</tr>`;
+        });
+    } else {
+        // Tek bir veri seti varsa
+        const row = [
+            `<td>${countryData.country}</td>`,
+            `<td>${countryData.date ? new Date(countryData.date).toLocaleDateString() : "Tarih yok"}</td>` // Tarih ekleniyor
+        ];
+
+        selectedMetrics.forEach(metricIndex => {
+            const metric = metricMapping[metricIndex];
+            if (metric) {
+                const value = countryData[metric.key] !== undefined ? countryData[metric.key] : "Veri yok";
+                row.push(`<td>${value}</td>`);
+            }
+        });
+
+        metricTableBody.innerHTML += `<tr>${row.join('')}</tr>`;
     }
 
-    // Tabloyu göster
+    // Tabloyu görünür hale getir
+    const metricTableContainer = document.getElementById('metricTableContainer');
     metricTableContainer.style.display = "block";
 }
 
 
-    
+function searchCountry() {
+    const searchInput = document.getElementById('search-input').value.trim();
+
+    // Eğer input boşsa hata mesajı ver
+    if (!searchInput) {
+        alert("Lütfen bir ülke adı girin.");
+        return;
+    }
+
+    // Seçili metrikleri ve yılları al
+    const yearCheckboxes = document.querySelectorAll('.year-checkbox:checked');
+    const selectedYears = Array.from(yearCheckboxes).map(checkbox => `01-01-${checkbox.value}`);
+    const metricCheckboxes = document.querySelectorAll('.form-check-input:checked');
+    const selectedMetrics = Array.from(metricCheckboxes).map((checkbox, index) => index + 1);
+
+    console.log("Aranan Ülke:", searchInput);
+    console.log("Seçilen Metrikler:", selectedMetrics);
+    console.log("Seçilen Yıllar:", selectedYears);
+
+    // Eğer hiçbir metrik seçilmemişse hata mesajı göster
+    if (selectedMetrics.length === 0) {
+        alert("Lütfen en az bir metrik seçin.");
+        return;
+    }
+
+    // fetchDataFromDatabase fonksiyonunu çağır
+    fetchDataFromDatabase(searchInput, selectedMetrics);
+}
+// JSON dosyasını yükle
+fetch('countries.geo.json')
+    .then((response) => response.json())
+    .then((data) => {
+        // JSON'dan ülke isimlerini çıkart
+        countries = data.features.map((feature) => feature.properties.name).filter(Boolean);
+    })
+    .catch((error) => {
+        console.error("JSON dosyası yüklenirken bir hata oluştu:", error);
+    });
+
+// Arama fonksiyonu
+function filterCountries(query) {
+    const resultsList = document.getElementById("search-results");
+    resultsList.innerHTML = ""; // Mevcut sonuçları temizle
+
+    if (query.trim() === "") {
+        resultsList.style.display = "none";
+        return;
+    }
+
+    // Filtreleme
+    const filtered = countries.filter((country) =>
+        country.toLowerCase().includes(query.toLowerCase())
+    );
+
+    // Sonuçları listeye ekleme
+    if (filtered.length > 0) {
+        filtered.forEach((country) => {
+            const li = document.createElement("li");
+            li.textContent = country;
+
+            // Tıklama ile arama alanına yazma
+            li.addEventListener("click", () => {
+                document.getElementById("search-input").value = country;
+                resultsList.style.display = "none";
+            });
+
+            resultsList.appendChild(li);
+        });
+
+        resultsList.style.display = "block";
+    } else {
+        resultsList.style.display = "none";
+    }
+}
+
+// Menü butonu ve içerik elemanlarını seç
+const metricMenuButton = document.querySelector('.metric-menu-button');
+const metricMenuContent = document.querySelector('.metric-menu-content');
+
+// Butona tıklayınca menüyü aç/kapa
+metricMenuButton.addEventListener('click', (e) => {
+    e.stopPropagation(); // Tıklamanın başka yerlere yayılmasını önler
+    metricMenuContent.style.display =
+        metricMenuContent.style.display === 'block' ? 'none' : 'block';
+});
+
+// Sayfanın başka bir yerine tıklayınca menüyü kapat
+document.addEventListener('click', () => {
+    if (metricMenuContent.style.display === 'block') {
+        metricMenuContent.style.display = 'none';
+    }
+});
+
+// Menü içeriğine tıklanırsa kapanmayı engelle
+metricMenuContent.addEventListener('click', (e) => {
+    e.stopPropagation(); // Tıklamanın başka yerlere yayılmasını önler
+});
+
 
 
 
